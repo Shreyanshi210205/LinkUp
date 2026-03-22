@@ -1,34 +1,34 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import connectDb from './config/db.js';
-import { createClient } from 'redis';
+import express from "express";
+import dotenv from "dotenv";
+import RedisImport from "ioredis";
 dotenv.config();
-connectDb();
-export const redisClient = createClient({
-    url: process.env.REDIS_URL || 'redis://localhost:6379',
-    socket: {
-        tls: true,
-        rejectUnauthorized: false,
-    },
+const Redis = RedisImport.default || RedisImport;
+const redis = new Redis(process.env.REDIS_URL || '', {
+    tls: {},
 });
-redisClient.on("error", (err) => {
-    console.error("Redis Client Error:", err);
+redis.on("connecting", () => {
+    console.log("Connecting...");
 });
-async function connectRedis() {
-    try {
-        console.log("Connecting to:", process.env.REDIS_URL);
-        await redisClient.connect();
-        console.log("Redis connected successfully 🚀");
-    }
-    catch (error) {
-        console.error("Redis connection failed:", error);
-    }
-}
-console.log(process.env.REDIS_URL);
-connectRedis();
+redis.on("connect", () => {
+    console.log("Connected");
+});
+redis.on("error", (err) => {
+    console.error("🔴 Redis error:", err);
+});
 const app = express();
-const port = process.env.PORT || 5000;
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+const PORT = process.env.PORT || 5000;
+console.log("URL:", JSON.stringify(process.env.REDIS_URL));
+app.get("/", async (req, res) => {
+    try {
+        await redis.set("msg", "working");
+        const val = await redis.get("msg");
+        res.json({ val });
+    }
+    catch (err) {
+        res.status(500).json({ error: "Redis failed" });
+    }
+});
+app.listen(PORT, () => {
+    console.log(`Server running on ${PORT}`);
 });
 //# sourceMappingURL=index.js.map
