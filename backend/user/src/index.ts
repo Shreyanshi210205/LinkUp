@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { createClient } from "redis";
+import userRoutes from './routes/user.js'
 
 dotenv.config();
 
@@ -19,6 +20,9 @@ redisClient.on("error", (err) => {
 });
 
 const app = express();//create a server
+
+app.use("/api/v1",userRoutes)
+
 const PORT = process.env.PORT || 5000;
 
 //test route for redis connection
