@@ -1,41 +1,39 @@
 import express from "express";
 import dotenv from "dotenv";
-import RedisImport from "ioredis";
+import { createClient } from "redis";
 
 dotenv.config();
 
-const Redis = RedisImport.default || RedisImport;
+export const redisClient = createClient({
+  url: process.env.REDIS_URL || '',
+});//create the client between my web and redis
 
-const redis = new Redis(process.env.REDIS_URL || '',{
-  tls:{},
-});
+redisClient
+  .connect()
+  .then(() => console.log("connected to redis"))
+  .catch(console.error);//connecting that client
 
-redis.on("connecting", () => {
-  console.log("Connecting...");
-});
-
-redis.on("connect", () => {
-  console.log("Connected");
-});
-
-redis.on("error", (err) => {
+//event listener for error in redis connection
+redisClient.on("error", (err) => {
   console.error("🔴 Redis error:", err);
 });
 
-const app = express();
+const app = express();//create a server
 const PORT = process.env.PORT || 5000;
-console.log("URL:", JSON.stringify(process.env.REDIS_URL));
+
+//test route for redis connection
 app.get("/", async (req, res) => {
   try {
-    await redis.set("msg", "working");
-    const val = await redis.get("msg");
+    await redisClient.set("msg", "working");
+    const val = await redisClient.get("msg");
+
     res.json({ val });
   } catch (err) {
     res.status(500).json({ error: "Redis failed" });
   }
 });
 
+//server connection
 app.listen(PORT, () => {
-
   console.log(`Server running on ${PORT}`);
 });

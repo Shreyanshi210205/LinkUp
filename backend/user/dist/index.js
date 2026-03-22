@@ -1,27 +1,24 @@
 import express from "express";
 import dotenv from "dotenv";
-import RedisImport from "ioredis";
+import { createClient } from "redis";
 dotenv.config();
-const Redis = RedisImport.default || RedisImport;
-const redis = new Redis(process.env.REDIS_URL || '', {
-    tls: {},
+export const redisClient = createClient({
+    url: process.env.REDIS_URL || '',
 });
-redis.on("connecting", () => {
-    console.log("Connecting...");
-});
-redis.on("connect", () => {
-    console.log("Connected");
-});
-redis.on("error", (err) => {
+redisClient
+    .connect()
+    .then(() => console.log("connected to redis"))
+    .catch(console.error);
+redisClient.on("error", (err) => {
     console.error("🔴 Redis error:", err);
 });
 const app = express();
 const PORT = process.env.PORT || 5000;
-console.log("URL:", JSON.stringify(process.env.REDIS_URL));
+//test route for redis connection
 app.get("/", async (req, res) => {
     try {
-        await redis.set("msg", "working");
-        const val = await redis.get("msg");
+        await redisClient.set("msg", "working");
+        const val = await redisClient.get("msg");
         res.json({ val });
     }
     catch (err) {
