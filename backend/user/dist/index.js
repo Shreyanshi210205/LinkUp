@@ -1,18 +1,23 @@
 import express from "express";
 import dotenv from "dotenv";
 import { createClient } from "redis";
+import userRoutes from './routes/user.js';
+import connectDb from "./config/db.js";
 dotenv.config();
+connectDb();
 export const redisClient = createClient({
     url: process.env.REDIS_URL || '',
-});
+}); //create the client between my web and redis
 redisClient
     .connect()
     .then(() => console.log("connected to redis"))
-    .catch(console.error);
+    .catch(console.error); //connecting that client
+//event listener for error in redis connection
 redisClient.on("error", (err) => {
     console.error("🔴 Redis error:", err);
 });
-const app = express();
+const app = express(); //create a server
+app.use("/api/v1", userRoutes);
 const PORT = process.env.PORT || 5000;
 //test route for redis connection
 app.get("/", async (req, res) => {
@@ -25,6 +30,7 @@ app.get("/", async (req, res) => {
         res.status(500).json({ error: "Redis failed" });
     }
 });
+//server connection
 app.listen(PORT, () => {
     console.log(`Server running on ${PORT}`);
 });

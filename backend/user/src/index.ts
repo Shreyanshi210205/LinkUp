@@ -2,8 +2,13 @@ import express from "express";
 import dotenv from "dotenv";
 import { createClient } from "redis";
 import userRoutes from './routes/user.js'
+import connectDb from "./config/db.js"
+
 
 dotenv.config();
+
+connectDb();
+
 
 export const redisClient = createClient({
   url: process.env.REDIS_URL || '',
