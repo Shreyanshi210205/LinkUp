@@ -5,6 +5,7 @@ dotenv.config()
 
 let channel:amqplib.Channel;
 
+//for connecting to a rabbitmq server
 export const connectRabbitMQ=async()=>{
     try{
         const connection =await amqplib.connect({
@@ -22,6 +23,7 @@ export const connectRabbitMQ=async()=>{
     }
 }
 
+//for sending the message to rabbit mq from a producer which is --> (user)
 export const publishToQueue=async(queueName:string,message:any)=>{
     if(!channel) {console.log("No RabbitMQ channel detected")
         return;
