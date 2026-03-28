@@ -26,6 +26,7 @@ redisClient.on("error", (err) => {
 });
 
 const app = express();//create a server
+app.use(express.json())
 
 app.use("/api/v1",userRoutes)
 
