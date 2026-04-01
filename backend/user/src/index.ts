@@ -4,6 +4,7 @@ import { createClient } from "redis";
 import userRoutes from './routes/user.js'
 import connectDb from "./config/db.js"
 import { connectRabbitMQ } from "./config/rabbitmq.js";
+import cors from 'cors'
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ redisClient.on("error", (err) => {
 
 const app = express();//create a server
 app.use(express.json())
+app.use(cors())
 
 app.use("/api/v1",userRoutes)
 
