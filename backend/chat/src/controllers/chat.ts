@@ -9,7 +9,7 @@ export const createNewChat=TryCatch(async(req:AuthenticatedRequest,res)=>{
     const {otherUserId}=req.body
     if(!otherUserId){
         res.status(400).json({
-            message:"Ohter user id is required"
+            message:"Other user id is required"
         })
         return;
     }
@@ -76,4 +76,11 @@ export const getAllChats=TryCatch(async(req:AuthenticatedRequest,res)=>{
     res.json({
         chats:chatWithUserData
     })
+})
+
+export const sendMessage=TryCatch(async(req:AuthenticatedRequest,res)=>{
+    const senderId=req.user?._id
+    const {chatId,text}=req.body
+    const imageFile=req.file
+    
 })
