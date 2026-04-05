@@ -49,4 +49,4 @@ const schema=new Schema <IMessage>(
     }
 )
 
-export const Messages= mongoose.model<IMessage>("Messages,schema")
+export const Messages= mongoose.model<IMessage>("Messages",schema)
