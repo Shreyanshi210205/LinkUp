@@ -218,20 +218,17 @@ export const getMessagesByChat=TryCatch(async(req:AuthenticatedRequest,res)=>{
     const messages=await Messages.find({
         chatId
     }).sort({createdAt:1})
-    const otherUserId=chat.users.find(
-        (userId)=>userId.toString()!==userId.toString()
-    )
 
-   
-
-    try {
-        const {data}=await axios.get(`${process.env.USER_SERVICE}/api/v1/user/${otherUserId}`)
- if(!otherUserId){
+    const otherUserId=chat.users.find(id=>id!==userId)
+    if(!otherUserId){
         res.status(400).json({
             message:"no other user"
         })
         return
     }
+    try {
+        const {data}=await axios.get(`${process.env.USER_SERVICE}/api/v1/user/${otherUserId}`)
+ 
         //socket
 
         res.status(200).json({
