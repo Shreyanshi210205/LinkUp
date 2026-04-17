@@ -1,15 +1,32 @@
 "use client"
 import { ArrowRight, Loader2Icon, LockIcon } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
-import React, { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import React, { useEffect, useRef, useState } from 'react'
 
 const VerifyPage = () => {
   const [loading,setLoading]=useState(false)
+  const [otp,setOtp]=useState<string[]>(["","","","","",""])
+  const [error,setError]=useState<string>("")
+  const [resendLoading,setResendLoading]=useState<boolean>(false)
+  const [timer,setTimer]=useState(60);
+  const inputRefs=useRef<Array<HTMLInputElement> | null>([])
+  const router=useRouter()
+
       const searchParams=useSearchParams()
       const email:string=searchParams.get("email") || ""
       const handleSubmit=async()=>{
           
       }
+      useEffect(()=>{
+        if(timer>0){
+            const interval=setInterval(() => {
+                setTimer((prev)=>prev-1)
+            }, 1000);
+            return ()=>clearInterval(interval)
+        }
+      },[timer])
+
+      console.log(timer)
       return (
       <div>
         <div className='min-h-screen bg-gray-900 flex items-center justify-center p-4'>
