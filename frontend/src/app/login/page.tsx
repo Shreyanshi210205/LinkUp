@@ -1,8 +1,8 @@
-"use-client"
+"use client";
 import React, { useState } from 'react'
-import { ArrowRight, Mail } from 'lucide-react'
+import { ArrowRight, Loader2, Loader2Icon, LoaderPinwheel, Mail } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 
 const Login = () => {
 
@@ -50,11 +50,18 @@ const Login = () => {
                 <input type="email" value={email} 
                 onChange={e=>setEmail(e.target.value)}    id="email" className='w-full px-4 py-4 bg-gray-700 border border-b-gray-600 rounded-lg text-white placeholder-gray-400' placeholder='Enter your email address' required/>
               </div>
-              <button type='submit' className='w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 cursor-pointer disbaled:opacity-50 disabled:cursor-not-allowed'>
-                <div className='flex items-center justify-center gap-2'>
+              <button type='submit' className='w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 cursor-pointer disbaled:opacity-50 disabled:cursor-not-allowed
+              disabled={loading}'>
+                {
+                  loading?(<div className='flex items-center justify-center gap-2'>
+                    <Loader2Icon className='w-5 h-5'/>
+                    Sending OTP to your mail...
+                  </div>):(<div className='flex items-center justify-center gap-2'>
                   <span>Send Verification Code</span>
                   <ArrowRight className='w-5 h-5'/>
-                </div>
+                </div>)
+                }
+                
               </button>
             </form>
         </div>
