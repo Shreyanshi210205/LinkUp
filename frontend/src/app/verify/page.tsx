@@ -9,13 +9,40 @@ const VerifyPage = () => {
   const [error,setError]=useState<string>("")
   const [resendLoading,setResendLoading]=useState<boolean>(false)
   const [timer,setTimer]=useState(60);
-  const inputRefs=useRef<Array<HTMLInputElement> | null>([])
+  const inputRefs=useRef<Array<HTMLInputElement> >([])
   const router=useRouter()
 
       const searchParams=useSearchParams()
       const email:string=searchParams.get("email") || ""
       const handleSubmit=async()=>{
           
+      }
+      const handleInputChange=(index:number,value:string):void=>{
+        if(value.length>1) return;
+        const newOtp=[...otp]
+        newOtp[index]=value;
+        setOtp(newOtp)
+        setError("")
+
+        if(value && index<5){
+          inputRefs.current[index+1]?.focus()
+        }
+      }
+      const handleKeyDown=(index:number,e:React.KeyboardEvent<HTMLElement>):void=>{
+        if(e.key==="Backspace" && !otp[index] && index>0){
+          inputRefs.current[index-1]?.focus()
+        }
+      }
+      const handlePaste=(e:React.ClipboardEvent<HTMLElement>):void=>{
+        e.preventDefault()
+        const pastedData=e.clipboardData.getData("text")
+        const digits= pastedData.replace(/\D/g,"").slice(0,6)
+        if(digits.length==6){
+          const newOtp=digits.split("")
+          setOtp(newOtp)
+          inputRefs.current[5]?.focus()
+        }
+
       }
       useEffect(()=>{
         if(timer>0){
@@ -45,11 +72,17 @@ const VerifyPage = () => {
               </div>
               <form onSubmit={handleSubmit} className='space-y-6'>
                 <div>
-                  <label htmlFor="email" className='block text-sm font-medium text-gray-300 mb-2'>Email Address</label>
-                  <input type="email" 
-                  // value={email} 
-                  // onChange={e=>setEmail(e.target.value)}    
-                  id="email" className='w-full px-4 py-4 bg-gray-700 border border-b-gray-600 rounded-lg text-white placeholder-gray-400' placeholder='Enter your email address' required/>
+                  <label  className='block text-sm font-medium text-gray-300 mb-4 text-center'>Enter your 6-digit otp here</label>
+                  <div className='flex justify-center in-checked:space-x-3'>
+                    {
+                      otp.map((digit,index)=>(
+                        <input key={index} ref={(el:HTMLInputElement)=>{
+                          inputRefs.current[index]=el;
+                        }} />
+                      ))
+                    }
+                  </div>
+                  
                 </div>
                 <button type='submit' className='w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 cursor-pointer disbaled:opacity-50 disabled:cursor-not-allowed
                 disabled={loading}'>
