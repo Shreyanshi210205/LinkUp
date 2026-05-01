@@ -1,4 +1,6 @@
 "use client"
+import axios from 'axios'
+import Cookies from 'js-cookie'
 import { ArrowRight, Loader2Icon, LockIcon } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
@@ -17,9 +19,40 @@ const VerifyPage = () => {
       const handleSubmit=async(e:React.SubmitEvent<HTMLFormElement>)=>{
           e.preventDefault();
           const otpString=otp.join("")
-          if(otpString.length!=6 ) setError("Please enter all 6 digitd")
-            return
+          if(otpString.length!==6 ) {setError("Please enter all 6 digits")
+            return;}
+          setError("")
+          setLoading(false)
+          try {
+            const {data}=await axios.post(`http://localhost:5000/api/v1/verify`,{
+              email,
+              otp:otpString
+            })
+            alert(data.message)
+            Cookies.set("token",data.token,{
+              expires:15,
+              secure: false,
+              path:"/",
+            })
+            setOtp(["","","","","",""]);
+            inputRefs.current[0]?.focus()
+
+          } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+              setError(error.response?.data?.message || "Verification failed")
+            } else {
+              setError("Verification failed")
+            }
+            console.log(error)
+          }finally{
+            setLoading(false)
+          }
       }
+
+      const handleResendOtp=async()=>{
+        setResendLoading(true)
+      }
+
       const handleInputChange=(index:number,value:string):void=>{
         if(value.length>1) return;
         const newOtp=[...otp]
@@ -95,7 +128,7 @@ const VerifyPage = () => {
                   
                 </div>
                 {
-                  error && <div className='bg-red border border-red-700 rounded-lg p-3 '>
+                  error && <div className='bg-red-900 border border-red-700 rounded-lg p-3 '>
                     <p className='text-red-300 text-sm text-center'>{error}</p>
                   </div>
                 }
@@ -116,7 +149,7 @@ const VerifyPage = () => {
               <div className='mt-6 text-center'>
                 <p className='text-gray-400 text-sm mb-4'>Didnt receive the code?</p>
                 {
-                  timer >0 ? <p className=''></p> : <button className='text-blue-500 hover:text-blue-300 font-medium text-sm
+                  timer >0 ? <p className='text-gray-400 text-sm '>Resend code in {timer} seconds</p> : <button className='text-blue-500 hover:text-blue-300 font-medium text-sm
                   hover:cursor-pointer 
                   disabled:opacity-50' disabled={resendLoading}>{resendLoading? "Sending...": "Resend OTP"}</button>
                 }
