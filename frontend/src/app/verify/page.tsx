@@ -113,10 +113,12 @@ const VerifyPage = () => {
                   
                 </button>
               </form>
-              <div className='mt-6 text-center '>
+              <div className='mt-6 text-center'>
                 <p className='text-gray-400 text-sm mb-4'>Didnt receive the code?</p>
                 {
-                  timer >0 ? <p className=''></p> : <button className='text-blue-500 hover:text-blue-300 font-medium text-sm disabled:opacity-50' disabled={resendLoading}>{resendLoading? "Sending...": "Resend OTP"}</button>
+                  timer >0 ? <p className=''></p> : <button className='text-blue-500 hover:text-blue-300 font-medium text-sm
+                  hover:cursor-pointer 
+                  disabled:opacity-50' disabled={resendLoading}>{resendLoading? "Sending...": "Resend OTP"}</button>
                 }
               </div>
           </div>
