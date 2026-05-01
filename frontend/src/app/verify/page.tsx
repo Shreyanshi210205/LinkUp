@@ -75,7 +75,7 @@ const VerifyPage = () => {
               </div>
               <form onSubmit={handleSubmit} className='space-y-6'>
                 <div>
-                  <label  className='block text-sm font-medium text-gray-300 mb-4 text-center'>Enter your 6-digit otp here</label>
+                  <label  className='block text-sm font-medium text-gray-300 mb-4 text-center'>Enter your 6-digit OTP here</label>
                   <div className='flex justify-center in-checked:space-x-3'>
                     {
                       otp.map((digit,index)=>(
@@ -114,7 +114,7 @@ const VerifyPage = () => {
                 </button>
               </form>
               <div className='mt-6 text-center '>
-                <p className='text-gray-400 text-sm mb-4'>Didn&#39t receive the code?</p>
+                <p className='text-gray-400 text-sm mb-4'>Didnt receive the code?</p>
                 {
                   timer >0 ? <p className=''></p> : <button className='text-blue-500 hover:text-blue-300 font-medium text-sm disabled:opacity-50' disabled={resendLoading}>{resendLoading? "Sending...": "Resend OTP"}</button>
                 }
