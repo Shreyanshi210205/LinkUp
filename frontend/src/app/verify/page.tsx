@@ -14,8 +14,11 @@ const VerifyPage = () => {
 
       const searchParams=useSearchParams()
       const email:string=searchParams.get("email") || ""
-      const handleSubmit=async()=>{
-          
+      const handleSubmit=async(e:React.SubmitEvent<HTMLFormElement>)=>{
+          e.preventDefault();
+          const otpString=otp.join("")
+          if(otpString.length!=6 ) setError("Please enter all 6 digitd")
+            return
       }
       const handleInputChange=(index:number,value:string):void=>{
         if(value.length>1) return;
@@ -78,13 +81,25 @@ const VerifyPage = () => {
                       otp.map((digit,index)=>(
                         <input key={index} ref={(el:HTMLInputElement)=>{
                           inputRefs.current[index]=el;
-                        }} />
+                        }} 
+                        type='text' 
+                        maxLength={1}
+                        value={digit}
+                        onChange={e=>handleInputChange(index,e.target.value)}
+                        onKeyDown={e=>handleKeyDown(index,e)}
+                        onPaste={index===0?handlePaste:undefined}
+                        className='m-0.5 w-12 h-12 text-center text-xl font-bold  border-2 border-gray-600 rounded-lg bg-gray-700 text-white'/>
                       ))
                     }
                   </div>
                   
                 </div>
-                <button type='submit' className='w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 cursor-pointer disbaled:opacity-50 disabled:cursor-not-allowed
+                {
+                  error && <div className='bg-red border border-red-700 rounded-lg p-3 '>
+                    <p className='text-red-300 text-sm text-center'>{error}</p>
+                  </div>
+                }
+                <button  type='submit' className='w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 cursor-pointer disbaled:opacity-50 disabled:cursor-not-allowed
                 disabled={loading}'>
                   {
                     loading?(<div className='flex items-center justify-center gap-2'>
@@ -98,6 +113,12 @@ const VerifyPage = () => {
                   
                 </button>
               </form>
+              <div className='mt-6 text-center '>
+                <p className='text-gray-400 text-sm mb-4'>Didn&#39t receive the code?</p>
+                {
+                  timer >0 ? <p className=''></p> : <button className='text-blue-500 hover:text-blue-300 font-medium text-sm disabled:opacity-50' disabled={resendLoading}>{resendLoading? "Sending...": "Resend OTP"}</button>
+                }
+              </div>
           </div>
         </div>
       </div>
