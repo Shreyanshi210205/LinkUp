@@ -51,6 +51,12 @@ const VerifyPage = () => {
 
       const handleResendOtp=async()=>{
         setResendLoading(true)
+        setError("")
+        try {
+          const {data}=await axios.post()
+        } catch (error) {
+          
+        }
       }
 
       const handleInputChange=(index:number,value:string):void=>{
