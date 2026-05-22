@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AppProvider } from "../context/AppContext";
 
 
 
@@ -17,7 +18,10 @@ export default function RootLayout({
     <html
       lang="en"
     >
-      <body >{children}</body>
+      <body >
+        <AppProvider>
+        {children}
+        </AppProvider></body>
     </html>
   );
 }
