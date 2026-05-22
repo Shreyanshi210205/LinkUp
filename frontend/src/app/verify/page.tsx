@@ -1,7 +1,7 @@
 "use client"
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { ArrowRight, Loader2Icon, LockIcon } from 'lucide-react'
+import { ArrowRight, ChevronLeft, Loader2Icon, LockIcon } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 
@@ -53,10 +53,21 @@ const VerifyPage = () => {
         setResendLoading(true)
         setError("")
         try {
-          const {data}=await axios.post()
-        } catch (error) {
-          
-        }
+          const {data}=await axios.post(`https://localhost:5000/api/v1/login`,{
+            email,
+          })
+          alert(data.message)
+          setTimer(60)
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+              setError(error.response?.data?.message || "Resend OTP failed")
+            } else {
+              setError("Resend OTP failed")
+            }
+            console.log(error)
+          }finally{
+            setResendLoading(false)
+          }
       }
 
       const handleInputChange=(index:number,value:string):void=>{
@@ -101,7 +112,8 @@ const VerifyPage = () => {
         <div className='min-h-screen bg-gray-900 flex items-center justify-center p-4'>
         <div className='max-w-md w-full '>
           <div className='bg-gray-800 border border-gray-700 rounded lg p-8'>
-              <div className='text-center mb-8'>
+              <div className='text-center mb-8 relative'>
+                <button className='absolute top-0 left-0 p-2 text-gray-300 hover:text-white'><ChevronLeft className='w-6 h-6'/></button>
                   <div className='mx-auto w-20 h-20 bg-blue-600 rounded-lg flex items-center justify-center mb-6'>
                       <LockIcon size={40} className='text-white'/>
                   </div>
@@ -157,7 +169,7 @@ const VerifyPage = () => {
                 {
                   timer >0 ? <p className='text-gray-400 text-sm '>Resend code in {timer} seconds</p> : <button className='text-blue-500 hover:text-blue-300 font-medium text-sm
                   hover:cursor-pointer 
-                  disabled:opacity-50' disabled={resendLoading}>{resendLoading? "Sending...": "Resend OTP"}</button>
+                  disabled:opacity-50' disabled={resendLoading} onClick={handleResendOtp}>{resendLoading? "Sending...": "Resend OTP"}</button>
                 }
               </div>
           </div>
