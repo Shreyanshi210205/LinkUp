@@ -1,12 +1,14 @@
 "use client"
-import { user_service } from '@/src/context/AppContext'
+import { useAppData, user_service } from '@/src/context/AppContext'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { ArrowRight, ChevronLeft, Loader2Icon, LockIcon } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { redirect, useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
+import Loading from './Loading'
 
 const VerifyOtp = () => {
+  const { isAuth , setIsAuth, setUser,loading:userLoading  } = useAppData()
   const [loading,setLoading]=useState(false)
   const [otp,setOtp]=useState<string[]>(["","","","","",""])
   const [error,setError]=useState<string>("")
@@ -37,7 +39,8 @@ const VerifyOtp = () => {
             })
             setOtp(["","","","","",""]);
             inputRefs.current[0]?.focus()
-
+            setUser(data.user)
+            setIsAuth(true)
           } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
               setError(error.response?.data?.message || "Verification failed")
@@ -108,6 +111,8 @@ const VerifyOtp = () => {
       },[timer])
 
       console.log(timer)
+      if(userLoading) return <Loading></Loading>
+      if(isAuth) redirect("/chat")
       return (
       <div>
         <div className='min-h-screen bg-gray-900 flex items-center justify-center p-4'>
