@@ -5,8 +5,8 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import toast, {Toaster} from 'react-hot-toast'
 
-export const user_service="https://localhost:5000"
-export const chat_service="https://localhost:5002"
+export const user_service="http://localhost:5000"
+export const chat_service="http://localhost:5002"
 
 export interface User{
     _id:string;
@@ -38,6 +38,14 @@ interface AppContextType{
     isAuth:boolean;
     setUser:React.Dispatch<React.SetStateAction<User|null>>
     setIsAuth:React.Dispatch<React.SetStateAction<boolean>>
+    logoutUser:()=>Promise <void> 
+    fetchUser:()=>Promise<void>
+    fetchChats:()=>Promise <void>
+    fetchUsers:()=>Promise <void>
+    chats:Chats[]|null
+    users:User[]|null;
+    setUsers:React.Dispatch<React.SetStateAction<User[]|null>>
+    setChats:React.Dispatch<React.SetStateAction<Chats[]|null>>
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined)
@@ -50,10 +58,9 @@ export const AppProvider:React.FC<AppProviderProps>=({children})=>{
     const [user,setUser]=useState<User|null>(null)
     const [isAuth,setIsAuth]=useState(false)
     const [loading,setLoading]=useState(true)
-let mounted = true
     async function fetchUser() {
         
-    }{
+    const mounted=true
             try {
                 const token=Cookies.get("token")
                 const {data}=await axios.get(`${user_service}/api/v1/me`,{
@@ -95,13 +102,34 @@ let mounted = true
         }
     }
 
+    const [users,setUsers]=useState<User[] | null>(null)
+    async function fetchUsers() {
+        const token=Cookies.get("token")
+        try{
+            const {data}=await axios.get(`${user_service}/api/v1/user/all`,{
+                headers:{
+                    Authorization:`Bearer ${token}`
+                }
+            })
+            setUsers(data)
+        }
+        catch(error){
+            console.log(error)
+        }
+    }
+
      useEffect(()=>{
-        fetchUser();
-        fetchChats();
+        const timer = setTimeout(() => {
+            void fetchUser();
+            void fetchChats();
+            void fetchUsers()
+        }, 0);
+
+        return () => clearTimeout(timer);
     },[])
 
 
-    return <AppContext.Provider value={{user,setUser,isAuth,setIsAuth,loading}}>{children}<Toaster></Toaster></AppContext.Provider>
+    return <AppContext.Provider value={{user,setUser,isAuth,setIsAuth,loading,logoutUser,fetchUser,fetchChats,fetchUsers,chats,users,setUsers,setChats}}>{children}<Toaster></Toaster></AppContext.Provider>
 }
 
 

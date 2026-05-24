@@ -1,7 +1,7 @@
 "use client"
 import Loading from '@/src/components/Loading'
 import { useAppData } from '@/src/context/AppContext'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
 
 const ChatApp = () => {

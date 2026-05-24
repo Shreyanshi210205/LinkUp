@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react'
-import { ArrowRight, Loader2, Loader2Icon, LoaderPinwheel, Mail } from 'lucide-react'
+import { ArrowRight, Loader2Icon, Mail } from 'lucide-react'
 import { redirect, useRouter } from 'next/navigation'
 import axios from 'axios'
 import { useAppData, user_service } from '@/src/context/AppContext';
@@ -26,7 +26,7 @@ const Login = () => {
       router.push(`/verify?email=${email}`)
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message)
+        toast.error("cannot send otp")
       } else {
         toast.error("An unexpected error occurred")
       }
