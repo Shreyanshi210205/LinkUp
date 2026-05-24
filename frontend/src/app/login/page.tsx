@@ -1,15 +1,19 @@
 "use client";
 import React, { useState } from 'react'
 import { ArrowRight, Loader2, Loader2Icon, LoaderPinwheel, Mail } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
 import axios from 'axios'
-import { user_service } from '@/src/context/AppContext';
+import { useAppData, user_service } from '@/src/context/AppContext';
+import Loading from '@/src/components/Loading';
+import toast from 'react-hot-toast';
 
 const Login = () => {
 
   const [email,setEmail]=useState<string>("")
   const [loading,setLoading]=useState<boolean>(false)
   const router=useRouter()
+
+  const {isAuth,loading:userLoading}=useAppData()
 
   const handleSubmit=async(e:React.SubmitEvent<HTMLElement>):Promise <void>=>{
     e.preventDefault()
@@ -18,19 +22,21 @@ const Login = () => {
       const {data}=await axios.post(`${user_service}/api/v1/login`,{
         email
       })
-      alert(data.message)
+      toast.success(data.message)
       router.push(`/verify?email=${email}`)
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message)
+        toast.error(error.response?.data?.message)
       } else {
-        alert("An unexpected error occurred")
+        toast.error("An unexpected error occurred")
       }
     }
     finally{
       setLoading(false)
     }
   }
+  if(userLoading) return <Loading></Loading>
+  if(isAuth) return redirect("/chat")
 
   return (
     <div className='min-h-screen bg-gray-900 flex items-center justify-center p-4'>

@@ -6,6 +6,7 @@ import { ArrowRight, ChevronLeft, Loader2Icon, LockIcon } from 'lucide-react'
 import { redirect, useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 import Loading from './Loading'
+import toast from 'react-hot-toast'
 
 const VerifyOtp = () => {
   const { isAuth , setIsAuth, setUser,loading:userLoading  } = useAppData()
@@ -31,7 +32,7 @@ const VerifyOtp = () => {
               email,
               otp:otpString
             })
-            alert(data.message)
+            toast.success(data.message)
             Cookies.set("token",data.token,{
               expires:15,
               secure: false,
@@ -60,7 +61,7 @@ const VerifyOtp = () => {
           const {data}=await axios.post(`${user_service}/api/v1/login`,{
             email,
           })
-          alert(data.message)
+          toast.success(data.message)
           setTimer(60)
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {

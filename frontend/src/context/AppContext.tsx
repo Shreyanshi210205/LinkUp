@@ -3,6 +3,7 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
+import toast, {Toaster} from 'react-hot-toast'
 
 export const user_service="https://localhost:5000"
 export const chat_service="https://localhost:5002"
@@ -49,10 +50,10 @@ export const AppProvider:React.FC<AppProviderProps>=({children})=>{
     const [user,setUser]=useState<User|null>(null)
     const [isAuth,setIsAuth]=useState(false)
     const [loading,setLoading]=useState(true)
-
-    useEffect(()=>{
-        let mounted = true
-        const fetchUser = async ()=>{
+let mounted = true
+    async function fetchUser() {
+        
+    }{
             try {
                 const token=Cookies.get("token")
                 const {data}=await axios.get(`${user_service}/api/v1/me`,{
@@ -70,11 +71,37 @@ export const AppProvider:React.FC<AppProviderProps>=({children})=>{
                 setLoading(false)
             }
         }
-        void fetchUser()
-        return ()=>{ mounted = false }
+
+   
+    async function logoutUser() {
+        Cookies.remove("token")
+        setUser(null)
+        setIsAuth(false)
+        toast.success("User Logged out")
+    }
+
+    const [chats,setChats]=useState<Chats[] | null>(null);
+    async function fetchChats() {
+        const token=Cookies.get("token")
+        try {
+            const {data} =await axios.get(`${chat_service}/api/v1/chat/all`,{
+                headers:{
+                    Authorization:`Bearer ${token}`
+                }
+            })
+            setChats(data.chats)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+     useEffect(()=>{
+        fetchUser();
+        fetchChats();
     },[])
 
-    return <AppContext.Provider value={{user,setUser,isAuth,setIsAuth,loading}}>{children}</AppContext.Provider>
+
+    return <AppContext.Provider value={{user,setUser,isAuth,setIsAuth,loading}}>{children}<Toaster></Toaster></AppContext.Provider>
 }
 
 
