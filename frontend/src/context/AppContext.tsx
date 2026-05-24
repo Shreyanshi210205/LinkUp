@@ -63,7 +63,7 @@ export const AppProvider:React.FC<AppProviderProps>=({children})=>{
     const mounted=true
             try {
                 const token=Cookies.get("token")
-                const {data}=await axios.get(`${user_service}/api/v1/me`,{
+                const {data}=await axios.get(`${user_service}/api/v1/profile`,{
                     headers:{
                         Authorization:`Bearer ${token}`
                     }

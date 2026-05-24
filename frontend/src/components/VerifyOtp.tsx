@@ -9,7 +9,7 @@ import Loading from './Loading'
 import toast from 'react-hot-toast'
 
 const VerifyOtp = () => {
-  const { isAuth , setIsAuth, setUser,loading:userLoading  } = useAppData()
+  const { isAuth , setIsAuth, setUser,loading:userLoading,fetchChats,fetchUsers  } = useAppData()
   const [loading,setLoading]=useState(false)
   const [otp,setOtp]=useState<string[]>(["","","","","",""])
   const [error,setError]=useState<string>("")
@@ -42,6 +42,8 @@ const VerifyOtp = () => {
             inputRefs.current[0]?.focus()
             setUser(data.user)
             setIsAuth(true)
+            fetchChats()
+            fetchUsers()
           } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
               setError(error.response?.data?.message || "Verification failed")
