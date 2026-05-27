@@ -1,4 +1,5 @@
 "use client"
+import ChatSidebar from '@/src/components/ChatSidebar'
 import Loading from '@/src/components/Loading'
 import { useAppData, User } from '@/src/context/AppContext'
 import { useRouter } from 'next/navigation'
@@ -39,11 +40,15 @@ const ChatApp = () => {
     if(!isAuth && !loading) router.push("/login")
   },[isAuth,router,loading])
 
+  const handleLogout=()=>{
+    logoutUser()
+  }
+
   if(loading) return <Loading></Loading>
   return (
     <div className='min-h-screen flex bg-gray-900 text-white relative overflow-hidden'>
 
-      Chatapp
+      <ChatSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} showAllUsers={showAllUser} setShowAllUsers={setShowAllUser} users={users} loggedInUser={loggedInUser} handleLogout={handleLogout} chats={chats} selectedUser={selectedUser} setSelectedUser={setSelectedUser} ></ChatSidebar>
       
     </div>
   )
