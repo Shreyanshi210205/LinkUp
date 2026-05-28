@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import { Chat, User } from "../context/AppContext";
+import { Chats, User } from "../context/AppContext";
 import {
   CornerDownRight,
   CornerUpLeft,
-  FileVideo,
+  LogOutIcon,
   MessageCircle,
   Plus,
   SearchIcon,
   UserCircle,
   X,
 } from "lucide-react";
+import Link from "next/link";
 
 interface ChatSidebarProps {
   sidebarOpen: boolean;
@@ -18,7 +19,7 @@ interface ChatSidebarProps {
   setShowAllUsers: (show: boolean | ((prev: boolean) => boolean)) => void;
   users: User[] | null;
   loggedInUser: User | null;
-  chats: any[] | null;
+  chats: Chats[] | null;
   setSelectedUser: (userId: string | null) => void;
   selectedUser: string | null;
   handleLogout: () => void;
@@ -43,25 +44,21 @@ const ChatSidebar = ({
       className={`fixed z-20 sm:static top-0 left-0 h-screen w-80 bg-gray-900 text-white border-8 border-gray-700 transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0 transition-transform flex flex-col`}
     >
       <div className="p-6 border-b border-gray-700">
-        <div className="sm:hidden flex justify-end mb-0">
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-300"></X>
-          </button>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-600 justify-between">
-                <MessageCircle className="w-5 h-5 text-white"></MessageCircle>
-              </div>
-              <h2 className="text-xl font-bold text-white">
-                {showAllUsers ? "New Chat" : "Messages"}
-              </h2>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2 bg-blue-600 rounded-lg shrink-0">
+              <MessageCircle className="w-5 h-5 text-white"></MessageCircle>
             </div>
+            <h2 className="text-xl font-bold text-white truncate">
+              {showAllUsers ? "New Chat" : "Messages"}
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setShowAllUsers((prev) => !prev)}
               className={`p-2.5 rounded-lg transition-colors ${showAllUsers ? "bg-red-600 hover:bg-red-700 text-white" : "bg-green-600 hover:bg-green-700 text-white"}`}
+              aria-label={showAllUsers ? "Close new chat view" : "Start new chat"}
             >
               {showAllUsers ? (
                 <X className="w-4 h-4"></X>
@@ -69,6 +66,14 @@ const ChatSidebar = ({
                 <Plus className="w-4 h-4"></Plus>
               )}
             </button>
+
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="sm:hidden p-2 hover:bg-gray-700 rounded-lg transition-colors"
+            aria-label="Close sidebar"
+          >
+            <X className="w-5 h-5 text-gray-300"></X>
+          </button>
           </div>
         </div>
       </div>
@@ -91,7 +96,7 @@ const ChatSidebar = ({
             </div>
 
             {/* users-list */}
-            <div className="space-y-2 overflow-y-auto h-ful" pb-4>
+            <div className="space-y-2 overflow-y-auto h-full pb-4">
               {users
                 ?.filter(
                   (u) =>
@@ -129,9 +134,9 @@ const ChatSidebar = ({
               const isSentByMe = latestMessage?.sender === loggedInUser?._id;
               const unseenCount = chat.chat.unseenCount || 0;
               return (
-                <button
+                  <button
                   key={chat.chat._id}
-                  onChange={() => {
+                    onClick={() => {
                     setSelectedUser(chat.chat._id);
                     setSidebarOpen(false);
                   }}
@@ -173,7 +178,7 @@ const ChatSidebar = ({
                             ></CornerDownRight>
                           )}
                           <span className="text-sm text-gray-400 truncate flex-1">
-=                            {latestMessage.text}
+                            {latestMessage.text}
                           </span>
                         </div>
                       )}
@@ -184,12 +189,32 @@ const ChatSidebar = ({
             })}
           </div>
         ) : (
-          <div className="felx flex-col items-center justify-center h-full text-center">
+          <div className="flex flex-col items-center justify-center h-full text-center">
             <div className="p-4 bg-gray-800 rounded-full mb-4">
-              <MessageCircle className="w"></MessageCircle>
+              <MessageCircle className="w-8 h-8 text-gray-400 "></MessageCircle>
             </div>
+            <p className="text-gray-400 font-medium ">No conversation yet</p>
+            <p className="text-sm text-gray-500 mt-1 ">
+              Start a new chat to begin messaging
+            </p>
           </div>
         )}
+      </div>
+
+      {/* footer */}
+      <div className="p-4 border-t border-gray-700 space-y-2">
+        <Link href={'/profile'} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+        <div className="p-1.5 bg-gray-700 rounded-lg">
+          <UserCircle className="w-4 h-4 text-gray-300 "/>
+          </div>
+          <span className="font-medium text-gray-300"> Profile</span>
+          </Link>
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-600 transition-colors text-red-500 hover:text-white">
+            <div className="p-1.5 bg-red-600 rounded-lg">
+          <LogOutIcon className="w-4 h-4 text-gray-300 "/>
+          </div>
+          <span className="font-medium">Logout</span>
+          </button>
       </div>
     </aside>
   );
