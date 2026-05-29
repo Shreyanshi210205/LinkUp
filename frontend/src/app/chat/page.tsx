@@ -8,7 +8,7 @@ import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import axios from 'axios'
 import ChatHeader from '@/src/components/ChatHeader'
-import { User } from 'lucide-react'
+import ChatMessages from '@/src/components/ChatMessages'
 
 export interface Message{
   _id:string;
@@ -112,6 +112,7 @@ const ChatApp = () => {
       setSidebarOpen={setSidebarOpen}
       isTyping={isTyping}
       />
+      <ChatMessages selectedUser={selectedUser} messages={messages} loggedInUser={loggedInUser}/>
       </div>
       
     </div>
