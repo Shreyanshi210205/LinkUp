@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useRef } from 'react'
 import Image from 'next/image'
 import { Message } from '../app/chat/page'
 import { User } from '../context/AppContext'
-import { CheckCheck } from 'lucide-react'
-import moment from 'moment'
+import { Check, CheckCheck } from 'lucide-react'
+import dayjs from 'dayjs'
 
 interface ChatMessagesProps{
     selectedUser:string | null
@@ -45,7 +45,7 @@ const ChatMessages = ({selectedUser,messages,loggedInUser}:ChatMessagesProps) =>
                             const uniqueKey=`${e._id}-${i}`
 
                             return (
-                                <div key={i} className={`flex flex-col gap-1 mt-2 ${isSentByMe?"items-end":"items-start"} `}>
+                                <div key={uniqueKey} className={`flex flex-col gap-1 mt-2 ${isSentByMe?"items-end":"items-start"} `}>
                                     <div className={`rounded-lg p-3 max-w-sm ${isSentByMe?"bg-blue-600 text-white ":"bg-gray-700 text-white"}`}>
                                         {
                                             e.messageType==="image" && e.image && (
@@ -63,26 +63,26 @@ const ChatMessages = ({selectedUser,messages,loggedInUser}:ChatMessagesProps) =>
                                     </div>
 
                                     <div className={`flex items-center gap-1 text-xs text-gray-400 ${isSentByMe?"pr-2 flex-row-reverse":"pl-2 "}`}>
-                                        <span className=''>{moment(e.createdAt).format("hh:mm A . MMM D")}</span>
+                                        <span className=''>{dayjs(e.createdAt).format("hh:mm A . MMM D")}</span>
                                         {
                                             isSentByMe && <div className='flex items-center ml-1'>
                                                 {
                                                     e.seen? <div className="flex items-center gap-1 text-blue-400">
-                                                        <CheckCheck className='w-3 h-3'></CheckCheck>
+                                                        <CheckCheck className='w-3 h-3'></CheckCheck>+
                                                         {
-                                                            e.seenAt && <span>{moment()}</span>
+                                                            e.seenAt && <span>{dayjs(e.seenAt).format("hh:mm A")}</span>
                                                         }
                                                     </div>
                                                     :
-                                                    <div></div>
+                                                    <Check className='w-3 h-3 text-gray-500'></Check>
                                                 }
                                             </div>
                                         }
                                     </div>
                                 </div>
                             )
-                        })
-                    }
+                        })}
+                        <div ref={bottomRef}> </div>
                     </>
                 )
             }
