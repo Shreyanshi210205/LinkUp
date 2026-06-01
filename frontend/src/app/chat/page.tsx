@@ -10,6 +10,7 @@ import axios from 'axios'
 import ChatHeader from '@/src/components/ChatHeader'
 import ChatMessages from '@/src/components/ChatMessages'
 import MessageInput from '@/src/components/MessageInput'
+import { SocketData } from '@/src/context/SocketContext'
 
 export interface Message{
   _id:string;
@@ -27,7 +28,9 @@ export interface Message{
 }
 
 const ChatApp = () => {
-  const {loading,isAuth,logoutUser,chats,user:loggedInUser,users,fetchChats,setChats}=useAppData()
+  const {loading,isAuth,logoutUser,chats,user:loggedInUser,users,fetchChats}=useAppData()
+  const {onlineUsers} =SocketData()
+  console.log(onlineUsers)
 
   const [selectedUser,setSelectedUser]=useState<string|null>(null)
   const [message,setMessage]=useState("")
@@ -37,7 +40,7 @@ const ChatApp = () => {
   const[showAllUser,setShowAllUser]=useState(false)
   const [isTyping,setIsTyping]=useState(false)//for indicator of typing
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout| null>(null)
-  
+   
 
 
   const router =useRouter()
@@ -68,6 +71,7 @@ const ChatApp = () => {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleMessageSend=async(e:any,imageFile?:File|null)=>{
     e.preventDefault()
 
@@ -161,7 +165,8 @@ const ChatApp = () => {
       handleLogout={handleLogout} chats={chats} 
       selectedUser={selectedUser} 
       setSelectedUser={setSelectedUser} 
-      createChat={createChat}>
+      createChat={createChat}
+      onlineUsers={onlineUsers}>
 
       </ChatSidebar>
       <div className='flex-1 flex flex-col justify-between p-4 backdrop-blur-xl bg-white/5 border border-white/10 '>
