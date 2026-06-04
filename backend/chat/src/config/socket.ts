@@ -16,7 +16,7 @@ const io=new Server(server,{
 const userSocketMap:Record<string,string>={}
 
 io.on("connection",(socket:Socket)=>{
-    console.log('User connected , socket.id')
+    console.log('User connected' , socket.id)
 
     const userId=socket.handshake.query.userId as string | undefined
 
