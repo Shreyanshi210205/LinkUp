@@ -1,7 +1,7 @@
 import {Server,Socket} from 'socket.io'
 import http from 'http'
 import express from 'express'
-import { Chat } from '../models/Chat.js';
+// import { Chat } from '../models/Chat.js';
 
 const app=express();
 const server=http.createServer(app)
@@ -33,14 +33,14 @@ io.on("connection",(socket:Socket)=>{
     
     socket.on("typing",(data)=>{
         console.log(`User ${data.userId} is typing in chat ${data.chatId}`)
-        socket.to(data.chatId).emit("userTyping ",{
+        socket.to(data.chatId).emit("userTyping",{
             chatId:data.chatId,
             userId:data.userId
         })
     })
 
     socket.on("stopTyping",(data)=>{
-        console.log(`uSER ${data.userId}stopped typing in chat ${data.chatId}`)
+        console.log(`User ${data.userId}stopped typing in chat ${data.chatId}`)
         socket.to(data.chatId).emit("userStoppedTyping",{
             chatId:data.chatId,
             userId:data.userId

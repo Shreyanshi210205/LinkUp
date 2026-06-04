@@ -29,8 +29,8 @@ export interface Message{
 
 const ChatApp = () => {
   const {loading,isAuth,logoutUser,chats,user:loggedInUser,users,fetchChats}=useAppData()
-  const {onlineUsers} =SocketData()
-  console.log(onlineUsers)
+  const {onlineUsers,socket} =SocketData()
+  // console.log(onlineUsers)
 
   const [selectedUser,setSelectedUser]=useState<string|null>(null)
   const [message,setMessage]=useState("")
@@ -77,7 +77,16 @@ const ChatApp = () => {
 
     if(!message.trim() && !imageFile) return
     if(!selectedUser) return
-    //socket
+
+    if(typingTimeout) {
+      clearTimeout(typingTimeout)
+      setTypingTimeout(null)
+    }
+    socket?.emit("stopTyping",{
+      chatId:selectedUser,
+      userId:loggedInUser?._id
+    })
+    
 
     const token=Cookies.get("token")
     try {
@@ -123,10 +132,44 @@ const ChatApp = () => {
 
   const handleTyping=(value:string)=>{
     setMessage(value)
-    if(!selectedUser) return
-    //socket
+    if(!selectedUser || !socket) return
+    if(value.trim()){
+      socket?.emit("typing",{
+        chatId:selectedUser,
+        userId:loggedInUser?._id
+      })
+    }
 
+    if(typingTimeout){
+      clearTimeout(typingTimeout)
+    }
+    const timeout=setTimeout(()=>{
+      socket.emit("stopTyping",{
+        chatId:selectedUser,
+        userId:loggedInUser?._id
+      })
+    },2000)
+    setTypingTimeout(timeout)
   }
+
+  useEffect(()=>{
+    socket?.on("userTyping",(data)=>{
+      console.log(`Received user typing`,data)
+      if(data.chatId===selectedUser && data.userId!==loggedInUser) 
+        setIsTyping(true)
+    })
+
+    socket?.on("userStoppedTyping",(data)=>{
+      console.log(`Received user stopped typing`,data)
+      if(data.chatId===selectedUser && data.userId!==loggedInUser) 
+        setIsTyping(false)
+    })
+
+    return ()=>{
+      socket?.off("userTyping")
+      socket?.off("userStoppedTyping")
+    }
+  },[socket,selectedUser,loggedInUser])
 
   useEffect(()=>{
     async function fetchChat() {
@@ -148,8 +191,16 @@ const ChatApp = () => {
 
     if(selectedUser){
       fetchChat()
+      setIsTyping(false)
+
+      socket?.emit("joinChat",selectedUser)
+
+      return ()=>{
+        socket?.emit("leaveChat",selectedUser)
+        setMessages(null)
+      }
     }
-  },[selectedUser, fetchChats])
+  },[selectedUser, fetchChats,socket])
 
   if(loading) return <Loading></Loading>
   return (
