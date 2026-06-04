@@ -61,7 +61,7 @@ const ChatHeader = ({user,setSidebarOpen,isTyping,onlineUsers}:ChatHeaderProps) 
                                         <span className={`text-sm font-medium ${isOnlineUser?"text-green-500" :"text-gray-400"}`}>
                                             {
                                                 isOnlineUser?"Online":"Offline"
-                                            }
+                                            }{" "}
                                         </span>
                                      </div>
                                 }
