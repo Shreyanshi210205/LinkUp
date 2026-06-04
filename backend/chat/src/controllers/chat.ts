@@ -17,12 +17,12 @@ export const createNewChat=TryCatch(async(req:AuthenticatedRequest,res)=>{
         users:{$all:[userId,otherUserId],$size:2}
     })
     if(existingChat){
-        res.status(400).json({
-            message: "Chat already exists",
-            chatId:existingChat._id
-        })
-        return
-    }
+    res.status(200).json({
+        message:"Chat already exists",
+        chatId:existingChat._id
+    })
+    return
+}
     const newChat=await Chat.create({
         users:[userId,otherUserId]
     })

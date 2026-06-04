@@ -15,7 +15,7 @@ import { SocketData } from '@/src/context/SocketContext'
 export interface Message{
   _id:string;
   chatId:string;
-  senderId:string;
+  sender:string;
   text?:string;
   image?:{
     url:string;
@@ -175,11 +175,12 @@ const ChatApp = () => {
     async function fetchChat() {
       const token=Cookies.get("token")
       try {
-        const {data}=await axios.get(`${chat_service}/api/v1/message/:${selectedUser}`,{
+        const {data}=await axios.get(`${chat_service}/api/v1/message/${selectedUser}`,{
           headers:{
             Authorization:`Bearer ${token}`
           }
         })
+        console.log(data)
         setMessages(data.messages);
         setUser(data.user)
         await fetchChats()
@@ -200,7 +201,15 @@ const ChatApp = () => {
         setMessages(null)
       }
     }
-  },[selectedUser, fetchChats,socket])
+  },[selectedUser,socket])
+
+  useEffect(()=>{
+    return ()=>{
+      if(typingTimeout) {
+        clearTimeout(typingTimeout)
+      }
+    }
+  },[typingTimeout])
 
   if(loading) return <Loading></Loading>
   return (

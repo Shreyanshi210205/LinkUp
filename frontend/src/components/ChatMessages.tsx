@@ -31,19 +31,23 @@ const ChatMessages = ({selectedUser,messages,loggedInUser}:ChatMessagesProps) =>
         bottomRef.current?.scrollIntoView({behavior:"smooth"})
     },[selectedUser,uniqueMessages])
 
+    
+
   return (
     <div className='flex-1 overflow-hidden'>
         <div className='h-full max-h-[calc(100vh-215px)] overflow-y-auto p-2 space-y-2 custom-scroll'>
             {
                 !selectedUser?(
-                    <p className='texgr40    text-center mt-20'>Please select a user to start chatting 📩</p>
+                    <p className='text-gray-400    text-center mt-20'>Please select a user to start chatting 📩</p>
                 ):(
                     <>
                     {
                         uniqueMessages.map((e,i)=>{
-                            const isSentByMe=e.senderId===loggedInUser?._id;
+                            const isSentByMe=e.sender===loggedInUser?._id;
                             const uniqueKey=`${e._id}-${i}`
-
+console.log("sender", e.sender);
+console.log("loggedInUser", loggedInUser?._id);
+console.log("isSentByMe", e.sender === loggedInUser?._id);
                             return (
                                 <div key={uniqueKey} className={`flex flex-col gap-1 mt-2 ${isSentByMe?"items-end":"items-start"} `}>
                                     <div className={`rounded-lg p-3 max-w-sm ${isSentByMe?"bg-blue-600 text-white ":"bg-gray-700 text-white"}`}>
