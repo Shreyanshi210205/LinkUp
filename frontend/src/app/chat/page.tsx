@@ -28,7 +28,7 @@ export interface Message{
 }
 
 const ChatApp = () => {
-  const {loading,isAuth,logoutUser,chats,user:loggedInUser,users,fetchChats}=useAppData()
+  const {loading,isAuth,logoutUser,chats,user:loggedInUser,users,fetchChats,setChats}=useAppData()
   const {onlineUsers,socket} =SocketData()
   // console.log(onlineUsers)
 
@@ -130,6 +130,58 @@ const ChatApp = () => {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const moveChatToTop=(chatId:string,newMessage:any,updatedUnseenCount=true)=>{
+      setChats((prev)=>{
+        if(!prev) return null
+
+        const updatedChats=[...prev]
+        const chatIndex=updatedChats.findIndex(
+          chat=>chat.chat._id===chatId
+        )
+        if(chatIndex!==-1){
+          const [moveChat]=updatedChats.splice(chatIndex,1)
+
+          const updatedChat={
+            ...moveChat,
+            chat:{
+              ...moveChat.chat,
+              latestMessage:{
+                text:newMessage.text,
+                sender:newMessage.sender
+              },
+              updatedAt:new Date().toString(),
+
+              unseenCount:updatedUnseenCount && newMessage.sender!==loggedInUser?._id?(moveChat.chat.unseenCount || 0)+1:moveChat.chat.unseenCount||0
+            }
+          };
+
+          updatedChats.unshift(updatedChat)
+        }
+        return updatedChats
+      })
+  }
+
+  const resetUnseenCount=(chatId:string)=>{
+    setChats((prev)=>{
+      if(!prev) return null
+
+      return prev.map((chat)=>{
+          if(chat.chat._id === chatId){
+            return {
+              ...chat,
+              chat:{
+                ...chat.chat,
+                unseenCount:0
+              }
+            }
+          }
+          return chat
+      })
+    })
+  }
+
+
   const handleTyping=(value:string)=>{
     setMessage(value)
     if(!selectedUser || !socket) return
@@ -153,6 +205,27 @@ const ChatApp = () => {
   }
 
   useEffect(()=>{
+    socket?.on("newMessage",(message)=>{
+      console.log("Received new message",message)
+
+      if(selectedUser ===message.chatId){
+        setMessages((prev)=>{
+          const currentMessages=prev|| []
+          const messageExists=currentMessages.some(
+            (msg)=>msg._id===message._id
+          )
+
+          if(!messageExists){
+            return [...currentMessages,message]
+          }
+          return currentMessages
+        })
+        moveChatToTop(message.chatId,message,false)
+      }
+  })
+
+
+
     socket?.on("userTyping",(data)=>{
       console.log(`Received user typing`,data)
       if(data.chatId===selectedUser && data.userId!==loggedInUser) 
@@ -194,6 +267,8 @@ const ChatApp = () => {
       fetchChat()
       setIsTyping(false)
 
+      resetUnseenCount(selectedUser)
+
       socket?.emit("joinChat",selectedUser)
 
       return ()=>{
@@ -203,6 +278,8 @@ const ChatApp = () => {
     }
   },[selectedUser,socket])
 
+
+  
   useEffect(()=>{
     return ()=>{
       if(typingTimeout) {
