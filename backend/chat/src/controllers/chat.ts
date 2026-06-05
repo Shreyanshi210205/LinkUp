@@ -169,8 +169,6 @@ export const sendMessage=TryCatch(async(req:AuthenticatedRequest,res)=>{
         updatedAt:new Date()
     },{new:true})
 
-    //emit to socket
-
     io.to(chatId).emit("newMessage",savedMessage)
     if(receiverSocketId){
         io.to(receiverSocketId).emit("newMessage",savedMessage)
@@ -254,7 +252,16 @@ export const getMessagesByChat=TryCatch(async(req:AuthenticatedRequest,res)=>{
     try {
         const {data}=await axios.get(`${process.env.USER_SERVICE}/api/v1/user/${otherUserId}`)
  
-        //socket
+        if(messagesToMarkSeen.length>0){
+            const otherUserSocketId=getReceiverSocketId(otherUserId.toString())
+            if(otherUserSocketId){
+                io.to(otherUserSocketId).emit("messagesSeen",{
+                    chatId:chatId,
+            seenBy:userId,
+            messageIds:messagesToMarkSeen.map((msg)=>msg._id)
+                })
+            }
+        }
 
         res.status(200).json({
             messages,
