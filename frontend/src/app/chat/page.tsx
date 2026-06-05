@@ -11,7 +11,6 @@ import ChatHeader from '@/src/components/ChatHeader'
 import ChatMessages from '@/src/components/ChatMessages'
 import MessageInput from '@/src/components/MessageInput'
 import { SocketData } from '@/src/context/SocketContext'
-import { text } from 'stream/consumers'
 
 export interface Message{
   _id:string;
